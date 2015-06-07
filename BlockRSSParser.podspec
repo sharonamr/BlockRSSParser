@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name         = "BlockRSSParser"
+  s.name         = "SharonBlockRSSParser"
   s.version      = "2.1"
   s.summary      = "AFNetworkingXMLRequestOperation based RSS parser."
   s.homepage     = "https://github.com/tibo/BlockRSSParser"
@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
 
   s.author       = { "Thibaut LE LEVIER" => "thibaut@lelevier.fr" }
 
-  s.source       = { :git => "https://github.com/tibo/BlockRSSParser.git", :tag => "2.1" }
+  s.source       = { :git => "https://github.com/sharon/BlockRSSParser.git", :tag => "2.1" }
 
   s.requires_arc = true
 
