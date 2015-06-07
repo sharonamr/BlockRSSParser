@@ -36,16 +36,16 @@
 
 #pragma mark parser
 
-+ (void)parseRSSFeedForRequest:(NSURLRequest *)urlRequest
++ (AFHTTPRequestOperation *)parseRSSFeedForRequest:(NSURLRequest *)urlRequest
                        success:(void (^)(NSArray *feedItems))success
                        failure:(void (^)(NSError *error))failure
 {
     RSSParser *parser = [[RSSParser alloc] init];
-    [parser parseRSSFeedForRequest:urlRequest success:success failure:failure];
+    return [parser parseRSSFeedForRequest:urlRequest success:success failure:failure];
 }
 
 
-- (void)parseRSSFeedForRequest:(NSURLRequest *)urlRequest
+- (AFHTTPRequestOperation *)parseRSSFeedForRequest:(NSURLRequest *)urlRequest
                        success:(void (^)(NSArray *feedItems))success
                        failure:(void (^)(NSError *error))failure
 {
@@ -67,6 +67,7 @@
                                      }];
     
     [operation start];
+    return operation;
     
 }
 
