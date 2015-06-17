@@ -16,6 +16,25 @@
 
 @implementation RSSItem
 
+- (void)setImageFromItemDescription{
+    self.itemDescription = [self.itemDescription stringByReplacingOccurrencesOfString:@"src=\"//" withString:@"src=\"http://"];
+
+    NSString *url = nil;
+    NSScanner *theScanner = [NSScanner scannerWithString:self.itemDescription];
+    // find start of IMG tag
+    [theScanner scanUpToString:@"<img" intoString:nil];
+    if (![theScanner isAtEnd]) {
+        [theScanner scanUpToString:@"src" intoString:nil];
+        NSCharacterSet *charset = [NSCharacterSet characterSetWithCharactersInString:@"\"'"];
+        [theScanner scanUpToCharactersFromSet:charset intoString:nil];
+        [theScanner scanCharactersFromSet:charset intoString:nil];
+        [theScanner scanUpToCharactersFromSet:charset intoString:&url];
+        // "url" now contains the URL of the img
+
+    }
+    self.imageURL = [NSURL URLWithString:url];
+}
+
 -(NSArray *)imagesFromItemDescription
 {
     if (self.itemDescription) {
