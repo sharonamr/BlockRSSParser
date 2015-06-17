@@ -14,25 +14,14 @@
 
 @end
 
-@implementation RSSItem
+@implementation RSSItem{
+    NSArray *imagesStrings;
+}
 
 - (void)setImageFromItemDescription{
-    self.itemDescription = [self.itemDescription stringByReplacingOccurrencesOfString:@"src=\"//" withString:@"src=\"http://"];
-
-    NSString *url = nil;
-    NSScanner *theScanner = [NSScanner scannerWithString:self.itemDescription];
-    // find start of IMG tag
-    [theScanner scanUpToString:@"<img" intoString:nil];
-    if (![theScanner isAtEnd]) {
-        [theScanner scanUpToString:@"src" intoString:nil];
-        NSCharacterSet *charset = [NSCharacterSet characterSetWithCharactersInString:@"\"'"];
-        [theScanner scanUpToCharactersFromSet:charset intoString:nil];
-        [theScanner scanCharactersFromSet:charset intoString:nil];
-        [theScanner scanUpToCharactersFromSet:charset intoString:&url];
-        // "url" now contains the URL of the img
-
-    }
-    self.imageURL = [NSURL URLWithString:url];
+    [self getImagesFromHTML];
+    if(imagesStrings.count > 0)
+        self.imageURL = [NSURL URLWithString:imagesStrings[0]];
 }
 
 -(NSArray *)imagesFromItemDescription
@@ -51,6 +40,36 @@
     }
     
     return nil;
+}
+
+-(void)getImagesFromHTML{
+    self.itemDescription = [self.itemDescription stringByReplacingOccurrencesOfString:@"src=\"//" withString:@"src=\"http://"];
+
+    NSMutableArray *images = [NSMutableArray new];
+    NSString *url = nil;
+    NSString *properties1 = nil;
+    NSString *properties2 = nil;
+    NSString *properties = nil;
+    NSScanner *theScanner = [NSScanner scannerWithString:self.itemDescription];
+    // find start of IMG tag
+    [theScanner scanUpToString:@"<img" intoString:nil];
+    while (![theScanner isAtEnd]) {
+        [theScanner scanUpToString:@"src" intoString:&properties1];
+        NSCharacterSet *charset = [NSCharacterSet characterSetWithCharactersInString:@"\"'"];
+        [theScanner scanUpToCharactersFromSet:charset intoString:nil];
+        [theScanner scanCharactersFromSet:charset intoString:nil];
+        [theScanner scanUpToCharactersFromSet:charset intoString:&url];
+        // "url" now contains the URL of the img
+        [theScanner scanUpToString:@">" intoString:&properties2];
+        properties = [NSString stringWithFormat:@"%@ %@", properties1, properties2];
+        
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"width=[\"']1[\"']" options:0 error:NULL];
+        NSTextCheckingResult *match = [regex firstMatchInString:properties options:0 range:NSMakeRange(0, [properties length])];
+        if(url && match.range.length == 0)
+            [images addObject:url];
+
+    }
+    imagesStrings = [NSArray arrayWithArray:images];
 }
 
 #pragma mark - retrieve images from html string using regexp (private methode)
